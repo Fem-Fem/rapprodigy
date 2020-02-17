@@ -6,20 +6,19 @@ import pandas as pd
 import random
 
 # import pdb
-# import urllib
 
 # parser = argparse.ArgumentParser()
 # parser.add_argument("--song", help="This is the 'song' variable")
 
 # args = parser.parse_args()
-# query = args.song
+# queries = args.song
 
-
+#Parser should include k_int
 
 auth_token = 'xI_s0mQF__hzFBdloHllfTJ20qrhsOiX6mf_vakxzbd2dIi73WZyMX60nFOJQ4Cb'
 arr = []
 
-queries = ["Ransom"]
+queries = ["Silicon Valley"]
 for query in queries:
 
 	url = 'https://api.genius.com/search?access_token=' + auth_token + "&q=" + query
@@ -33,7 +32,12 @@ for query in queries:
 	url = response.json()["response"]["hits"][0]["result"]["url"]
 	response = requests.get(url)
 	soup = bs.BeautifulSoup(response.text, features="html.parser")
-	arr.append(soup.find(class_='lyrics').get_text())
+	text = soup.find(class_='lyrics').get_text()
+	# remove words between [] in text
+	arr.append(text)
+
+# Perhaps include more robust data tests here?
+# Unique words, syllables.
 
 # for lyrics in arr:
 # 	dictionary = {}
@@ -62,9 +66,7 @@ class MarkovRap:
 		library = {}
 		text_tester = self.text
 		for i in range(self.k_int):
-			text_tester = text_tester + self.text[i] ###need to update this code
-		print(len(text_tester))
-		print(len(self.text))
+			text_tester = text_tester + self.text[i]
 		for i in range(len(self.text)):
 			k = i + self.k_int
 			if library.get(text_tester[i:k]) == None:
@@ -91,6 +93,8 @@ class MarkovRap:
 		print(self.text)
 		print(self.k_int)
 		print(self.dictionary)
+
+# Randomly generate a start point for markov model?
 
 rap = MarkovRap(arr[0], 2)
 rap.kgram()
