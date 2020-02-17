@@ -16,60 +16,8 @@ import re
 
 #Parser should include k_int
 
-# class RapGetter():
-
-# 	def __init__(self):
-# 		self.auth_token = 'xI_s0mQF__hzFBdloHllfTJ20qrhsOiX6mf_vakxzbd2dIi73WZyMX60nFOJQ4Cb'
-# 		self.arr = []
-# 		self.queries = ["Have Mercy", "Broke as Fuck"]
-
-# 	def fetch(self):
-		
-# 		for query in self.queries:
-# 			url = 'https://api.genius.com/search?access_token=' + self.auth_token + "&q=" + query
-# 			url = url.encode("utf-8")
-
-# 			response = requests.get(url)
-# 			title = response.json()["response"]["hits"][0]["result"]["title"]
-# 			url = response.json()["response"]["hits"][0]["result"]["url"]
-# 			id = response.json()["response"]["hits"][0]["result"]["id"]
-
-# 			url = response.json()["response"]["hits"][0]["result"]["url"]
-# 			response = requests.get(url)
-# 			soup = bs.BeautifulSoup(response.text, features="html.parser")
-# 			text = soup.find(class_='lyrics').get_text()
-# 			# remove words between [] in text
-# 			text = re.split('\[[^\]]*]', text)
-# 			s = ''
-# 			text = s.join(text)
-# 			self.arr.append(text)
-
-# 	def compile(self):
-# 		for i in self.arr:
-# 			if self.arr[0] != i:
-# 				self.arr[0] = self.arr[0] + i
-
-# 	def print_info(self):
-# 		print(self.arr[0])
-
 # Perhaps include more robust data tests here?
 # Unique words, syllables.
-
-# for lyrics in arr:
-# 	dictionary = {}
-# 	cleanlyrics = lyrics.replace('\n', ' ')
-# 	for word in cleanlyrics.split(" "):
-# 		if word.strip() == "":
-# 			this = False
-# 		elif word in dictionary:
-# 			dictionary[word] = dictionary[word] + 1
-# 		else:
-# 			dictionary[word] = 0
-
-# 	for word in dictionary:
-# 		if dictionary[word] >= 4:
-# 			print(word)
-# 	print("==================")
 
 class RapGetter():
 
@@ -167,24 +115,4 @@ lyrics.print_info()
 
 rap = MarkovRap(lyrics.arr[0], 7)
 rap.kgram()
-rap.next_letter("broke")
-
-# url = 'https://genius.com/artists/ybn-cordae'
-# url = url.encode("utf-8")
-
-# response = requests.get(url)
-# soup = bs.BeautifulSoup(response.text, features="html.parser")
-# url = soup.find(class_='thumbnail_grid white_container').find(class_='vertical_album_card').get('href')
-
-# response = requests.get(url)
-# soup = bs.BeautifulSoup(response.text, features="html.parser")
-# thislist = soup.find_all(class_='chart_row chart_row--light_border chart_row--full_bleed_left chart_row--align_baseline chart_row--no_hover')
-# counter = 0
-# for i in thislist:
-# 	thislist[counter] = i.find(class_='chart_row-content').find('a').get('href')
-# 	counter = counter + 1
-# finallist = []
-# for i in thislist:
-# 	if 'skit' not in i:
-# 		finallist.append(i)
-# print(finallist)
+rap.next_letter("broke a")
