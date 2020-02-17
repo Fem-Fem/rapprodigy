@@ -4,6 +4,7 @@ import bs4 as bs
 import argparse
 import pandas as pd
 import random
+import re
 
 # import pdb
 
@@ -15,26 +16,41 @@ import random
 
 #Parser should include k_int
 
-auth_token = 'xI_s0mQF__hzFBdloHllfTJ20qrhsOiX6mf_vakxzbd2dIi73WZyMX60nFOJQ4Cb'
-arr = []
+class RapGetter():
 
-queries = ["Silicon Valley"]
-for query in queries:
+	def __init__(self):
+		self.auth_token = 'xI_s0mQF__hzFBdloHllfTJ20qrhsOiX6mf_vakxzbd2dIi73WZyMX60nFOJQ4Cb'
+		self.arr = []
+		self.queries = ["Have Mercy", "RNP", "Broke as Fuck"]
 
-	url = 'https://api.genius.com/search?access_token=' + auth_token + "&q=" + query
-	url = url.encode("utf-8")
+	def fetch(self):
+		
+		for query in self.queries:
+			url = 'https://api.genius.com/search?access_token=' + self.auth_token + "&q=" + query
+			url = url.encode("utf-8")
 
-	response = requests.get(url)
-	title = response.json()["response"]["hits"][0]["result"]["title"]
-	url = response.json()["response"]["hits"][0]["result"]["url"]
-	id = response.json()["response"]["hits"][0]["result"]["id"]
+			response = requests.get(url)
+			title = response.json()["response"]["hits"][0]["result"]["title"]
+			url = response.json()["response"]["hits"][0]["result"]["url"]
+			id = response.json()["response"]["hits"][0]["result"]["id"]
 
-	url = response.json()["response"]["hits"][0]["result"]["url"]
-	response = requests.get(url)
-	soup = bs.BeautifulSoup(response.text, features="html.parser")
-	text = soup.find(class_='lyrics').get_text()
-	# remove words between [] in text
-	arr.append(text)
+			url = response.json()["response"]["hits"][0]["result"]["url"]
+			response = requests.get(url)
+			soup = bs.BeautifulSoup(response.text, features="html.parser")
+			text = soup.find(class_='lyrics').get_text()
+			# remove words between [] in text
+			text = re.split('\[[^\]]*]', text)
+			s = ''
+			text = s.join(text)
+			self.arr.append(text)
+
+	def compile(self):
+		for i in self.arr:
+			self.arr[0] = self.arr[0] + i
+
+	def print_info(self):
+		for i in self.arr:
+			print(i)
 
 # Perhaps include more robust data tests here?
 # Unique words, syllables.
@@ -79,7 +95,7 @@ class MarkovRap:
 		self.dictionary = library
 
 	def next_letter(self, text):
-		for z in range(150):
+		for z in range(300):
 			population = []
 			weights = []
 			for i in self.dictionary[text[-self.k_int:]]:
@@ -96,18 +112,24 @@ class MarkovRap:
 
 # Randomly generate a start point for markov model?
 
-rap = MarkovRap(arr[0], 2)
-rap.kgram()
-rap.next_letter("I ")
+# rap = MarkovRap(arr[0], 2)
+# rap.kgram()
+# rap.next_letter("I ")
 
-rap = MarkovRap(arr[0], 3)
-rap.kgram()
-rap.next_letter("I g")
+# rap = MarkovRap(arr[0], 3)
+# rap.kgram()
+# rap.next_letter("I g")
 
-rap = MarkovRap(arr[0], 4)
-rap.kgram()
-rap.next_letter("I go")
+# rap = MarkovRap(arr[0], 4)
+# rap.kgram()
+# rap.next_letter("I go")
 
-rap = MarkovRap(arr[0], 5)
+lyrics = RapGetter()
+lyrics.fetch()
+lyrics.compile()
+lyrics.print_info()
+
+rap = MarkovRap(lyrics.arr[0], 4)
 rap.kgram()
-rap.next_letter("I got")
+rap.next_letter("Sweet")
+
