@@ -77,7 +77,7 @@ class MarkovRap:
 		self.text = text
 		self.k_int = k_int
 		self.dictionary = ''
-
+	#perhaps add code so that different rap lyrics dont rap around but instead they are counted for the markov model each time??
 	def kgram(self):
 		library = {}
 		text_tester = self.text
