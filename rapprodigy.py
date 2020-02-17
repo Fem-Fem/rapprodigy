@@ -15,7 +15,7 @@ import pandas as pd
 auth_token = 'xI_s0mQF__hzFBdloHllfTJ20qrhsOiX6mf_vakxzbd2dIi73WZyMX60nFOJQ4Cb'
 arr = []
 
-queries = ["Ransom"]
+queries = ["Ransom", "Rodeo", "RNP", "Antidote"]
 for query in queries:
 
 	url = 'https://api.genius.com/search?access_token=' + auth_token + "&q=" + query
@@ -43,6 +43,25 @@ for lyrics in arr:
 			dictionary[word] = 0
 
 	for word in dictionary:
-		if dictionary[word] >= 3:
+		if dictionary[word] >= 4:
 			print(word)
 	print("==================")
+
+class MarkovRap:
+
+	def __init__(self, text, k_int):
+		self.text = text
+		self.int = k_int
+
+	def kgram():
+		dictionary = {}
+		text_tester = self.text + self.test[0, 1]
+		for i in range(len(text)):
+			if dictionary[text_tester[i, i+1]] == None:
+				dictionary[text_tester[i, i+1]] = {text[i + 1 + 1]: 1}
+			else:
+				if dictionary[text_tester[i, i+1]][text[i + 1 + 1]]:
+					dictionary[text_tester[i, i+1]][text[i + 1 + 1]] = dictionary[text_tester[i, i+1]][text[i + 1 + 1]] + 1
+				else:
+					dictionary[text_tester[i, i+1]][text[i + 1 + 1]] = 1
+
