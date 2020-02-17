@@ -3,6 +3,7 @@ import requests
 import bs4 as bs
 import argparse
 import pandas as pd
+import random
 
 # import pdb
 # import urllib
@@ -15,24 +16,24 @@ import pandas as pd
 
 
 
-# auth_token = 'xI_s0mQF__hzFBdloHllfTJ20qrhsOiX6mf_vakxzbd2dIi73WZyMX60nFOJQ4Cb'
-# arr = []
+auth_token = 'xI_s0mQF__hzFBdloHllfTJ20qrhsOiX6mf_vakxzbd2dIi73WZyMX60nFOJQ4Cb'
+arr = []
 
-# queries = ["Ransom", "Rodeo", "RNP", "Antidote"]
-# for query in queries:
+queries = ["Ransom"]
+for query in queries:
 
-# 	url = 'https://api.genius.com/search?access_token=' + auth_token + "&q=" + query
-# 	url = url.encode("utf-8")
+	url = 'https://api.genius.com/search?access_token=' + auth_token + "&q=" + query
+	url = url.encode("utf-8")
 
-# 	response = requests.get(url)
-# 	title = response.json()["response"]["hits"][0]["result"]["title"]
-# 	url = response.json()["response"]["hits"][0]["result"]["url"]
-# 	id = response.json()["response"]["hits"][0]["result"]["id"]
+	response = requests.get(url)
+	title = response.json()["response"]["hits"][0]["result"]["title"]
+	url = response.json()["response"]["hits"][0]["result"]["url"]
+	id = response.json()["response"]["hits"][0]["result"]["id"]
 
-# 	url = response.json()["response"]["hits"][0]["result"]["url"]
-# 	response = requests.get(url)
-# 	soup = bs.BeautifulSoup(response.text, features="html.parser")
-# 	arr.append(soup.find(class_='lyrics').get_text())
+	url = response.json()["response"]["hits"][0]["result"]["url"]
+	response = requests.get(url)
+	soup = bs.BeautifulSoup(response.text, features="html.parser")
+	arr.append(soup.find(class_='lyrics').get_text())
 
 # for lyrics in arr:
 # 	dictionary = {}
@@ -72,11 +73,23 @@ class MarkovRap:
 					library[text_tester[i:k]][text_tester[k]] = 1
 		self.dictionary = library
 
+	def next_letter(self, text):
+		for z in range(150):
+			population = []
+			weights = []
+			for i in self.dictionary[text[-2:]]:
+				population.append(i)
+				weights.append(self.dictionary[text[-2:]][i])
+			new_letter = random.choices(population, weights)
+			text = text + new_letter[0]
+		print(text)
+
 	def print_info(self):
 		print(self.text)
 		print(self.k_int)
 		print(self.dictionary)
 
-rap = MarkovRap("I got a new whip that I gotta thank the lot foh", 2)
+rap = MarkovRap(arr[0], 2)
 rap.kgram()
-rap.print_info()
+# rap.print_info()
+rap.next_letter("I ")
