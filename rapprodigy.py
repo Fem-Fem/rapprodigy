@@ -21,7 +21,7 @@ class RapGetter():
 	def __init__(self):
 		self.auth_token = 'xI_s0mQF__hzFBdloHllfTJ20qrhsOiX6mf_vakxzbd2dIi73WZyMX60nFOJQ4Cb'
 		self.arr = []
-		self.queries = ["Have Mercy", "RNP", "Broke as Fuck"]
+		self.queries = ["Have Mercy", "Broke as Fuck"]
 
 	def fetch(self):
 		
@@ -46,11 +46,11 @@ class RapGetter():
 
 	def compile(self):
 		for i in self.arr:
-			self.arr[0] = self.arr[0] + i
+			if self.arr[0] != i:
+				self.arr[0] = self.arr[0] + i
 
 	def print_info(self):
-		for i in self.arr:
-			print(i)
+		print(self.arr[0])
 
 # Perhaps include more robust data tests here?
 # Unique words, syllables.
@@ -95,7 +95,7 @@ class MarkovRap:
 		self.dictionary = library
 
 	def next_letter(self, text):
-		for z in range(300):
+		for z in range(500):
 			population = []
 			weights = []
 			for i in self.dictionary[text[-self.k_int:]]:
@@ -131,5 +131,5 @@ lyrics.print_info()
 
 rap = MarkovRap(lyrics.arr[0], 4)
 rap.kgram()
-rap.next_letter("Sweet")
+rap.next_letter("Broke")
 
