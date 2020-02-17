@@ -60,10 +60,13 @@ class MarkovRap:
 
 	def kgram(self):
 		library = {}
-		text_tester = self.text + self.text[0] + self.text[1]
+		text_tester = self.text
+		for i in range(self.k_int):
+			text_tester = text_tester + self.text[i] ###need to update this code
+		print(len(text_tester))
+		print(len(self.text))
 		for i in range(len(self.text)):
-			j = i + 1
-			k = i + 1 + 1
+			k = i + self.k_int
 			if library.get(text_tester[i:k]) == None:
 				library[text_tester[i:k]] = {text_tester[k]: 1}
 			else:
@@ -77,9 +80,9 @@ class MarkovRap:
 		for z in range(150):
 			population = []
 			weights = []
-			for i in self.dictionary[text[-2:]]:
+			for i in self.dictionary[text[-self.k_int:]]:
 				population.append(i)
-				weights.append(self.dictionary[text[-2:]][i])
+				weights.append(self.dictionary[text[-self.k_int:]][i])
 			new_letter = random.choices(population, weights)
 			text = text + new_letter[0]
 		print(text)
@@ -91,5 +94,16 @@ class MarkovRap:
 
 rap = MarkovRap(arr[0], 2)
 rap.kgram()
-# rap.print_info()
 rap.next_letter("I ")
+
+rap = MarkovRap(arr[0], 3)
+rap.kgram()
+rap.next_letter("I g")
+
+rap = MarkovRap(arr[0], 4)
+rap.kgram()
+rap.next_letter("I go")
+
+rap = MarkovRap(arr[0], 5)
+rap.kgram()
+rap.next_letter("I got")
