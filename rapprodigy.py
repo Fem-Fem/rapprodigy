@@ -12,56 +12,71 @@ import pandas as pd
 
 # args = parser.parse_args()
 # query = args.song
-auth_token = 'xI_s0mQF__hzFBdloHllfTJ20qrhsOiX6mf_vakxzbd2dIi73WZyMX60nFOJQ4Cb'
-arr = []
 
-queries = ["Ransom", "Rodeo", "RNP", "Antidote"]
-for query in queries:
 
-	url = 'https://api.genius.com/search?access_token=' + auth_token + "&q=" + query
-	url = url.encode("utf-8")
 
-	response = requests.get(url)
-	title = response.json()["response"]["hits"][0]["result"]["title"]
-	url = response.json()["response"]["hits"][0]["result"]["url"]
-	id = response.json()["response"]["hits"][0]["result"]["id"]
+# auth_token = 'xI_s0mQF__hzFBdloHllfTJ20qrhsOiX6mf_vakxzbd2dIi73WZyMX60nFOJQ4Cb'
+# arr = []
 
-	url = response.json()["response"]["hits"][0]["result"]["url"]
-	response = requests.get(url)
-	soup = bs.BeautifulSoup(response.text, features="html.parser")
-	arr.append(soup.find(class_='lyrics').get_text())
+# queries = ["Ransom", "Rodeo", "RNP", "Antidote"]
+# for query in queries:
 
-for lyrics in arr:
-	dictionary = {}
-	cleanlyrics = lyrics.replace('\n', ' ')
-	for word in cleanlyrics.split(" "):
-		if word.strip() == "":
-			this = False
-		elif word in dictionary:
-			dictionary[word] = dictionary[word] + 1
-		else:
-			dictionary[word] = 0
+# 	url = 'https://api.genius.com/search?access_token=' + auth_token + "&q=" + query
+# 	url = url.encode("utf-8")
 
-	for word in dictionary:
-		if dictionary[word] >= 4:
-			print(word)
-	print("==================")
+# 	response = requests.get(url)
+# 	title = response.json()["response"]["hits"][0]["result"]["title"]
+# 	url = response.json()["response"]["hits"][0]["result"]["url"]
+# 	id = response.json()["response"]["hits"][0]["result"]["id"]
+
+# 	url = response.json()["response"]["hits"][0]["result"]["url"]
+# 	response = requests.get(url)
+# 	soup = bs.BeautifulSoup(response.text, features="html.parser")
+# 	arr.append(soup.find(class_='lyrics').get_text())
+
+# for lyrics in arr:
+# 	dictionary = {}
+# 	cleanlyrics = lyrics.replace('\n', ' ')
+# 	for word in cleanlyrics.split(" "):
+# 		if word.strip() == "":
+# 			this = False
+# 		elif word in dictionary:
+# 			dictionary[word] = dictionary[word] + 1
+# 		else:
+# 			dictionary[word] = 0
+
+# 	for word in dictionary:
+# 		if dictionary[word] >= 4:
+# 			print(word)
+# 	print("==================")
 
 class MarkovRap:
 
 	def __init__(self, text, k_int):
 		self.text = text
-		self.int = k_int
+		self.k_int = k_int
+		self.dictionary = ''
 
-	def kgram():
-		dictionary = {}
-		text_tester = self.text + self.test[0, 1]
-		for i in range(len(text)):
-			if dictionary[text_tester[i, i+1]] == None:
-				dictionary[text_tester[i, i+1]] = {text[i + 1 + 1]: 1}
+	def kgram(self):
+		library = {}
+		text_tester = self.text + self.text[0] + self.text[1]
+		for i in range(len(self.text)):
+			j = i + 1
+			k = i + 1 + 1
+			if library.get(text_tester[i:k]) == None:
+				library[text_tester[i:k]] = {text_tester[k]: 1}
 			else:
-				if dictionary[text_tester[i, i+1]][text[i + 1 + 1]]:
-					dictionary[text_tester[i, i+1]][text[i + 1 + 1]] = dictionary[text_tester[i, i+1]][text[i + 1 + 1]] + 1
+				if library[text_tester[i:k]].get(text_tester[k]):
+					library[text_tester[i:k]][text_tester[k]] = library[text_tester[i:k]][text_tester[k]] + 1
 				else:
-					dictionary[text_tester[i, i+1]][text[i + 1 + 1]] = 1
+					library[text_tester[i:k]][text_tester[k]] = 1
+		self.dictionary = library
 
+	def print_info(self):
+		print(self.text)
+		print(self.k_int)
+		print(self.dictionary)
+
+rap = MarkovRap("I got a new whip that I gotta thank the lot foh", 2)
+rap.kgram()
+rap.print_info()
