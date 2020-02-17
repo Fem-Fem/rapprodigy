@@ -112,24 +112,31 @@ class MarkovRap:
 
 # Randomly generate a start point for markov model?
 
-# rap = MarkovRap(arr[0], 2)
+# lyrics = RapGetter()
+# lyrics.fetch()
+# lyrics.compile()
+# lyrics.print_info()
+
+# rap = MarkovRap(lyrics.arr[0], 4)
 # rap.kgram()
-# rap.next_letter("I ")
+# rap.next_letter("Broke")
 
-# rap = MarkovRap(arr[0], 3)
-# rap.kgram()
-# rap.next_letter("I g")
+url = 'https://genius.com/artists/ybn-cordae'
+url = url.encode("utf-8")
 
-# rap = MarkovRap(arr[0], 4)
-# rap.kgram()
-# rap.next_letter("I go")
+response = requests.get(url)
+soup = bs.BeautifulSoup(response.text, features="html.parser")
+url = soup.find(class_='thumbnail_grid white_container').find(class_='vertical_album_card').get('href')
 
-lyrics = RapGetter()
-lyrics.fetch()
-lyrics.compile()
-lyrics.print_info()
-
-rap = MarkovRap(lyrics.arr[0], 4)
-rap.kgram()
-rap.next_letter("Broke")
-
+response = requests.get(url)
+soup = bs.BeautifulSoup(response.text, features="html.parser")
+thislist = soup.find_all(class_='chart_row chart_row--light_border chart_row--full_bleed_left chart_row--align_baseline chart_row--no_hover')
+counter = 0
+for i in thislist:
+	thislist[counter] = i.find(class_='chart_row-content').find('a').get('href')
+	counter = counter + 1
+finallist = []
+for i in thislist:
+	if 'skit' not in i:
+		finallist.append(i)
+print(finallist)
