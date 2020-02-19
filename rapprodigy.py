@@ -66,9 +66,14 @@ class RapGetter():
 			text = text.replace('\n', ' ')
 			s = ''
 			text = s.join(text).lower().strip()
-			text = text.split(" ")
-			print(text)
-			self.word_list = s.join(text)
+			text = text.replace('\' ', ' ')
+			text = s.join(text).lower().strip()
+			text = text.replace(',', ' ')
+			text = s.join(text).lower().strip()
+			# text = text.split(" ")
+			# print(text)
+			# amount of commas???? maybe cool thing to see?
+			self.word_list = self.word_list + " " + text
 
 	def compile(self):
 		for i in self.arr:
@@ -83,26 +88,31 @@ class RapGetter():
 
 	def wordcloud(self):
 		store = {}
-		for i in self.word_list:
+		for i in self.word_list.split(" "):
 			if i in store:
 				store[i] = store[i] + 1
 			else:
 				store[i] = 1
 
+		set_ = set()
 		arr = []
-		print(store)
 		for i in store:
-			if store[i] >= 4:
+			if store[i] >= 10:
 				arr.append(i)
 
-		print(len(arr))
-		text = ""
+		potentially_often_used_rap_words = ["nigga", "uh", "yeah", "shit", "niggas", "fuck", "fuckin'"]
 		for i in arr:
+			if i not in potentially_often_used_rap_words:
+				print(i)
+				set_.add(i)
+		text = ""
+		for i in set_:
 			text = text + " " + i
 		cloud = WordCloud(background_color="white").generate(text)
 		plt.imshow(cloud)
 		plt.axis("off")
 		plt.show()
+		print(set_)
 
 # class MarkovRap:
 
