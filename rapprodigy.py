@@ -8,6 +8,7 @@ import re
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 
+# remove albums with super long outros and skits?
 
 # import pdb
 
@@ -24,57 +25,65 @@ import matplotlib.pyplot as plt
 
 class RapGetter():
 
-	def __init__(self):
+	def __init__(self, artist, url):
 		self.arr = []
+		self.artist = artist
 		self.queries = []
 		self.word_list = ''
+		self.commas = 0
+		self.question_marks = 0
+		self.url = url
 
 	def fetch(self):
 
-		url = 'https://genius.com/artists/ybn-cordae'
-		url = url.encode("utf-8")
+		# url = url.encode("utf-8")
 
-		response = requests.get(url)
-		soup = bs.BeautifulSoup(response.text, features="html.parser")
-		url = soup.find(class_='thumbnail_grid white_container').find(class_='vertical_album_card').get('href')
-
-		response = requests.get(url)
+		response = requests.get(self.url)
 		soup = bs.BeautifulSoup(response.text, features="html.parser")
 		thislist = soup.find_all(class_='chart_row chart_row--light_border chart_row--full_bleed_left chart_row--align_baseline chart_row--no_hover')
 		counter = 0
 		for i in thislist:
 			thislist[counter] = i.find(class_='chart_row-content').find('a').get('href')
 			counter = counter + 1
-		finallist = []
+		final_list = []
 		for i in thislist:
 			if 'skit' not in i:
-				finallist.append(i)
-		print(finallist)
-		self.queries = finallist
+				final_list.append(i)
+		self.queries = final_list
+
+	def clean(self):
 		
 		for query in self.queries:
 
 			response = requests.get(query)
 			soup = bs.BeautifulSoup(response.text, features="html.parser")
 			text = soup.find(class_='lyrics').get_text()
-			"""remove words between [] in text"""
-			text = re.split('\[[^\]]*]', text)
-			s = ''
-			text = s.join(text)
+
+			# remove words between [] in text, which stores metadata on the song
+			text = re.sub('\[[^\]]*]', '', text).strip()
+
+			#????
 			self.arr.append(text)
 
-			text = text.replace('\n', ' ')
-			s = ''
-			text = s.join(text).lower().strip()
-			text = text.replace('\' ', ' ')
-			text = s.join(text).lower().strip()
-			text = text.replace(',', ' ')
-			text = s.join(text).lower().strip()
-			# text = text.split(" ")
-			# print(text)
-			# amount of commas???? maybe cool thing to see?
-			self.word_list = self.word_list + " " + text
+			# clean strings
+			text = text.replace('\n', ' ').lower().strip()
+			
+			text = re.sub('[\(\)\'!]', '', text).strip()
 
+			text = text.split(",")
+			s = ''
+			self.commas = len(text) - 1
+			text = s.join(text).lower().strip()
+
+			text = text.split("?")
+			s = ''
+			self.question_marks = len(text) - 1
+			text = s.join(text).lower().strip()
+
+			text = re.sub('\s\s+', ' ', text)
+			self.word_list = text
+
+	# for markov model
 	def compile(self):
 		for i in self.arr:
 			if self.arr[0] != i:
@@ -100,9 +109,9 @@ class RapGetter():
 			if store[i] >= 10:
 				arr.append(i)
 
-		potentially_often_used_rap_words = ["nigga", "uh", "yeah", "shit", "niggas", "fuck", "fuckin'"]
+		potentially_often_used_rap_words_and_common_words = ["nigga", "uh", "yeah", "shit", "niggas", "fuck", "fuckin'", "uhh", "ayy", "the"]
 		for i in arr:
-			if i not in potentially_often_used_rap_words:
+			if i not in potentially_often_used_rap_words_and_common_words:
 				print(i)
 				set_.add(i)
 		text = ""
@@ -114,6 +123,15 @@ class RapGetter():
 		plt.show()
 		print(set_)
 
+	# @classmethod
+	# def dataframe(cls):
+	# 	return 
+
+	def dataframe(self):
+		words = self.word_list.split(" ")
+		df = pd.DataFrame({self.artist: words})
+		return df
+		
 # class MarkovRap:
 
 # 	def __init__(self, text, k_int):
@@ -155,11 +173,21 @@ class RapGetter():
 
 # Randomly generate a start point for markov model?
 
-lyrics = RapGetter()
-lyrics.fetch()
-lyrics.compile()
-lyrics.wordcloud()
-# lyrics.print_info()
+url_list = [
+	# 'https://genius.com/albums/Chance-the-rapper/Coloring-book',
+	# 'https://genius.com/albums/Ybn-cordae/The-lost-boy',
+	'https://genius.com/albums/Lil-wayne/Tha-carter-iii'
+]
+
+i = 0
+for url in url_list:
+	i = i + 1
+	lyrics = RapGetter(i, url)
+	lyrics.fetch()
+	lyrics.clean()
+	lyrics.dataframe()
+# lyrics.compile()
+# lyrics.wordcloud()
 
 # rap = MarkovRap(lyrics.arr[0], 7)
 # rap.kgram()
