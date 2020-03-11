@@ -36,17 +36,18 @@ class RapGetter():
 
 	def fetch(self):
 
-		# url = url.encode("utf-8")
-
+		# get all songs
 		response = requests.get(self.url)
 		soup = bs.BeautifulSoup(response.text, features="html.parser")
 		thislist = soup.find_all(class_='chart_row chart_row--light_border chart_row--full_bleed_left chart_row--align_baseline chart_row--no_hover')
 		counter = 0
-		for i in thislist:
-			thislist[counter] = i.find(class_='chart_row-content').find('a').get('href')
+		for i in this_list:
+			this_list[counter] = i.find(class_='chart_row-content').find('a').get('href')
 			counter = counter + 1
 		final_list = []
-		for i in thislist:
+
+		# remove skits from analysis
+		for i in this_list:
 			if 'skit' not in i:
 				final_list.append(i)
 		self.queries = final_list
@@ -62,7 +63,7 @@ class RapGetter():
 			# remove words between [] in text, which stores metadata on the song
 			text = re.sub('\[[^\]]*]', '', text).strip()
 
-			#????
+			# store original datal, untouched
 			self.arr.append(text)
 
 			# clean strings
@@ -89,12 +90,17 @@ class RapGetter():
 			if self.arr[0] != i:
 				self.arr[0] = self.arr[0] + i
 
+
+	# make method to call markov model??
+
+	# this will return different info if I've run `compile` or not though, not exactly ideal.
 	def print_info(self):
 		print(self.arr[0])
 
 	def print_word_list(self):
 		print(self.word_list)
 
+	# can i break this up?
 	def wordcloud(self):
 		store = {}
 		for i in self.word_list.split(" "):
@@ -112,8 +118,8 @@ class RapGetter():
 		potentially_often_used_rap_words_and_common_words = ["nigga", "uh", "yeah", "shit", "niggas", "fuck", "fuckin'", "uhh", "ayy", "the"]
 		for i in arr:
 			if i not in potentially_often_used_rap_words_and_common_words:
-				print(i)
 				set_.add(i)
+
 		text = ""
 		for i in set_:
 			text = text + " " + i
@@ -127,11 +133,12 @@ class RapGetter():
 	# def dataframe(cls):
 	# 	return 
 
+	# this is incorrect, i want to be able to create a dataframe and append things to it :/
 	def dataframe(self):
 		words = self.word_list.split(" ")
 		df = pd.DataFrame({self.artist: words})
 		return df
-		
+
 # class MarkovRap:
 
 # 	def __init__(self, text, k_int):
