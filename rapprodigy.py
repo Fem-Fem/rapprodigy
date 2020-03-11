@@ -10,47 +10,46 @@ import matplotlib.pyplot as plt
 
 # remove albums with super long outros and skits?
 
-# import pdb
-
 # parser = argparse.ArgumentParser()
 # parser.add_argument("--song", help="This is the 'song' variable")
-
 # args = parser.parse_args()
 # queries = args.song
-
-# Parser should include k_int
 
 # Perhaps include more robust data tests here?
 # Unique words, syllables.
 
 class RapGetter():
 
-	def __init__(self, artist, url):
-		self.arr = []
-		self.artist = artist
+	_df = pd.DataFrame(columns = ['Text', 'Commas', 'Question Marks', 'Unique Words'])
+
+	def __init__(self, url):
+		self.original_text = ''
+		self.artist = re.search(r'albums\/(.*?)\/', url).group(1)
 		self.queries = []
 		self.word_list = ''
 		self.commas = 0
 		self.question_marks = 0
 		self.url = url
+		self.wordcloud_count = 10
 
 	def fetch(self):
 
 		# get all songs
 		response = requests.get(self.url)
 		soup = bs.BeautifulSoup(response.text, features="html.parser")
-		thislist = soup.find_all(class_='chart_row chart_row--light_border chart_row--full_bleed_left chart_row--align_baseline chart_row--no_hover')
+		list_of_songs = soup.find_all(class_='chart_row chart_row--light_border chart_row--full_bleed_left chart_row--align_baseline chart_row--no_hover')
 		counter = 0
-		for i in this_list:
-			this_list[counter] = i.find(class_='chart_row-content').find('a').get('href')
+		for i in list_of_songs:
+			list_of_songs[counter] = i.find(class_='chart_row-content').find('a').get('href')
 			counter = counter + 1
-		final_list = []
+		final_list_of_songs = []
 
 		# remove skits from analysis
-		for i in this_list:
+		for i in list_of_songs:
 			if 'skit' not in i:
-				final_list.append(i)
-		self.queries = final_list
+				final_list_of_songs.append(i)
+		self.queries = final_list_of_songs
+
 
 	def clean(self):
 		
@@ -64,7 +63,10 @@ class RapGetter():
 			text = re.sub('\[[^\]]*]', '', text).strip()
 
 			# store original datal, untouched
-			self.arr.append(text)
+			if self.original_text == '':
+				self.original_text = self.original_text + text
+			else:
+				self.original_text = self.original_text + " " + text
 
 			# clean strings
 			text = text.replace('\n', ' ').lower().strip()
@@ -84,24 +86,31 @@ class RapGetter():
 			text = re.sub('\s\s+', ' ', text)
 			self.word_list = text
 
-	# for markov model
-	def compile(self):
-		for i in self.arr:
-			if self.arr[0] != i:
-				self.arr[0] = self.arr[0] + i
+	# make method to call markov model
 
 
-	# make method to call markov model??
-
-	# this will return different info if I've run `compile` or not though, not exactly ideal.
+	# this will return different info if I've run `compile` or not though, not exactly ideal. 
 	def print_info(self):
-		print(self.arr[0])
+		print(self.original_text[0])
+
 
 	def print_word_list(self):
 		print(self.word_list)
 
+
+	def filter_wordcloud_by_size(self, store, n):
+		word_appears_more_than_n_times = []
+		for i in store:
+			if store[i] > n:
+				word_appears_more_than_n_times.append(i)
+
+		return word_appears_more_than_n_times
+
+
 	# can i break this up?
 	def wordcloud(self):
+		# count number of unique variables
+		# should i just do this in the dataframe?
 		store = {}
 		for i in self.word_list.split(" "):
 			if i in store:
@@ -109,35 +118,33 @@ class RapGetter():
 			else:
 				store[i] = 1
 
-		set_ = set()
-		arr = []
-		for i in store:
-			if store[i] >= 10:
-				arr.append(i)
+		word_appears_more_than_n_times = filter_wordcloud_by_size(store, self.wordcloud_count)
 
 		potentially_often_used_rap_words_and_common_words = ["nigga", "uh", "yeah", "shit", "niggas", "fuck", "fuckin'", "uhh", "ayy", "the"]
-		for i in arr:
+		set_ = set()
+		for i in word_appears_more_than_n_times:
 			if i not in potentially_often_used_rap_words_and_common_words:
 				set_.add(i)
 
-		text = ""
+		wordcloud_text = ""
 		for i in set_:
-			text = text + " " + i
-		cloud = WordCloud(background_color="white").generate(text)
+			wordcloud_text = wordcloud_text + " " + i
+		cloud = WordCloud(background_color="white").generate(wordcloud_text)
 		plt.imshow(cloud)
 		plt.axis("off")
 		plt.show()
-		print(set_)
 
 	# @classmethod
 	# def dataframe(cls):
 	# 	return 
 
 	# this is incorrect, i want to be able to create a dataframe and append things to it :/
+	# ask for help
 	def dataframe(self):
 		words = self.word_list.split(" ")
-		df = pd.DataFrame({self.artist: words})
-		return df
+		RapGetter._df = RapGetter._df.append([[words]])
+		print(RapGetter._df)
+		return RapGetter._df
 
 # class MarkovRap:
 
@@ -181,20 +188,18 @@ class RapGetter():
 # Randomly generate a start point for markov model?
 
 url_list = [
-	# 'https://genius.com/albums/Chance-the-rapper/Coloring-book',
-	# 'https://genius.com/albums/Ybn-cordae/The-lost-boy',
+	'https://genius.com/albums/Chance-the-rapper/Coloring-book',
+	'https://genius.com/albums/Ybn-cordae/The-lost-boy',
 	'https://genius.com/albums/Lil-wayne/Tha-carter-iii'
 ]
 
-i = 0
 for url in url_list:
-	i = i + 1
-	lyrics = RapGetter(i, url)
-	lyrics.fetch()
-	lyrics.clean()
-	lyrics.dataframe()
-# lyrics.compile()
-# lyrics.wordcloud()
+	lyrics = RapGetter(url)
+	# lyrics.fetch()
+	# lyrics.clean()
+	# lyrics.dataframe()
+
+# print(RapGetter._df)
 
 # rap = MarkovRap(lyrics.arr[0], 7)
 # rap.kgram()
