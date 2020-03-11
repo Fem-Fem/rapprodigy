@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 # queries = args.song
 
 # Perhaps include more robust data tests here?
-# Unique words, syllables.
+# Unique words, number of syllables, number of words repeated, divide by total number of words/total length of album
 
 class RapGetter():
 
