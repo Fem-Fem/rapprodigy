@@ -18,16 +18,17 @@ import matplotlib.pyplot as plt
 # Perhaps include more robust data tests here?
 # Unique words, number of syllables, number of words repeated, divide by total number of words/total length of album
 
+# Make more granular. Unique words/question marks/commas per album and per song?
+
 class RapGetter():
 
-	_df = pd.DataFrame(columns = ['Artist', 'Album,' 'Song', 'Text', 'Commas', 'Question Marks', 'Unique Words'])
+	_df = pd.DataFrame(columns = ['Artist', 'Album,' 'Song', 'Text', 'Commas', 'Question Marks'])
 
 	def __init__(self, url):
 		self.original_text = ''
 		self.artist = re.search(r'albums\/(.*?)\/', url).group(1)
 		self.album = re.search(r'.+(\/.+)$', url).group(1)
 		self.queries = []
-		self.album_names = []
 		self.song_titles = []
 		self.word_list = []
 		self.commas = 0
@@ -150,9 +151,16 @@ class RapGetter():
 	# this is incorrect, i want to be able to create a dataframe and append things to it :/
 	# ask for help
 	def dataframe(self):
-		for i in self.word_list:
-			RapGetter._df = RapGetter._df.append([self.artist, [self.word_list]])
-		print(RapGetter._df)
+		for i in range(len(self.word_list)):
+			RapGetter._df = RapGetter._df.append({
+				'Artist': self.artist, 
+				'Text': self.word_list[i],
+				'Album': self.album,
+				'Song': self.song_titles[i],
+				'Commas': self.commas,
+				'Question Marks': self.question_marks
+				}, ignore_index=True)
+		return RapGetter._df
 		# return RapGetter._df
 
 # class MarkovRap:
@@ -205,7 +213,6 @@ for url in url_list:
 	lyrics = RapGetter(url)
 	lyrics.fetch()
 	lyrics.clean()
-	# print(lyrics.word_list)
 	lyrics.dataframe()
 
 # print(RapGetter._df)
