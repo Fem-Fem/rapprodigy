@@ -25,8 +25,11 @@ class RapGetter():
 	def __init__(self, url):
 		self.original_text = ''
 		self.artist = re.search(r'albums\/(.*?)\/', url).group(1)
+		self.album = re.search(r'.+(\/.+)$', url).group(1)
 		self.queries = []
-		self.word_list = ''
+		self.album_names = []
+		self.song_titles = []
+		self.word_list = []
 		self.commas = 0
 		self.question_marks = 0
 		self.url = url
@@ -54,9 +57,14 @@ class RapGetter():
 	def clean(self):
 		
 		for query in self.queries:
-
+		
 			response = requests.get(query)
 			soup = bs.BeautifulSoup(response.text, features="html.parser")
+
+			# find song title here
+			song_title = soup.find(class_='header_with_cover_art-primary_info-title').text
+			self.song_titles.append(song_title)
+
 			text = soup.find(class_='lyrics').get_text()
 
 			# remove words between [] in text, which stores metadata on the song
@@ -84,7 +92,7 @@ class RapGetter():
 			text = s.join(text).lower().strip()
 
 			text = re.sub('\s\s+', ' ', text)
-			self.word_list = text
+			self.word_list.append(text)
 
 	# make method to call markov model
 
@@ -143,7 +151,7 @@ class RapGetter():
 	def dataframe(self):
 		words = self.word_list.split(" ")
 		RapGetter._df = RapGetter._df.append([[words]])
-		print(RapGetter._df)
+		# print(RapGetter._df)
 		return RapGetter._df
 
 # class MarkovRap:
@@ -190,13 +198,13 @@ class RapGetter():
 url_list = [
 	'https://genius.com/albums/Chance-the-rapper/Coloring-book',
 	'https://genius.com/albums/Ybn-cordae/The-lost-boy',
-	'https://genius.com/albums/Lil-wayne/Tha-carter-iii'
 ]
 
 for url in url_list:
 	lyrics = RapGetter(url)
-	# lyrics.fetch()
-	# lyrics.clean()
+	lyrics.fetch()
+	lyrics.clean()
+	# print(lyrics.word_list)
 	# lyrics.dataframe()
 
 # print(RapGetter._df)
