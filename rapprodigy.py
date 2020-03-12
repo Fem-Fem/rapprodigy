@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 
 class RapGetter():
 
-	_df = pd.DataFrame(columns = ['Text', 'Commas', 'Question Marks', 'Unique Words'])
+	_df = pd.DataFrame(columns = ['Artist', 'Album,' 'Song', 'Text', 'Commas', 'Question Marks', 'Unique Words'])
 
 	def __init__(self, url):
 		self.original_text = ''
@@ -116,6 +116,7 @@ class RapGetter():
 
 
 	# can i break this up?
+	# need to make wordcloud per song, per album, and per artist?
 	def wordcloud(self):
 		# count number of unique variables
 		# should i just do this in the dataframe?
@@ -149,10 +150,10 @@ class RapGetter():
 	# this is incorrect, i want to be able to create a dataframe and append things to it :/
 	# ask for help
 	def dataframe(self):
-		words = self.word_list.split(" ")
-		RapGetter._df = RapGetter._df.append([[words]])
-		# print(RapGetter._df)
-		return RapGetter._df
+		for i in self.word_list:
+			RapGetter._df = RapGetter._df.append([self.artist, [self.word_list]])
+		print(RapGetter._df)
+		# return RapGetter._df
 
 # class MarkovRap:
 
@@ -205,7 +206,7 @@ for url in url_list:
 	lyrics.fetch()
 	lyrics.clean()
 	# print(lyrics.word_list)
-	# lyrics.dataframe()
+	lyrics.dataframe()
 
 # print(RapGetter._df)
 
