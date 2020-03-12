@@ -18,23 +18,26 @@ import matplotlib.pyplot as plt
 # Perhaps include more robust data tests here?
 # Unique words, number of syllables, number of words repeated, divide by total number of words/total length of album
 
-# Make more granular. Unique words/question marks/commas per album and per song?
+# Make more granular. Unique words/question marks/commas per album and per song? do this in dataframe?
 
 class RapGetter():
 
 	_df = pd.DataFrame(columns = ['Artist', 'Album,' 'Song', 'Text', 'Commas', 'Question Marks'])
 
 	def __init__(self, url):
+		# for markov?
 		self.original_text = ''
+
+		self.url = url
+		self.queries = []
+		self.wordcloud_count = 10
+
 		self.artist = re.search(r'albums\/(.*?)\/', url).group(1)
 		self.album = re.search(r'.+(\/.+)$', url).group(1)
-		self.queries = []
 		self.song_titles = []
 		self.word_list = []
-		self.commas = 0
-		self.question_marks = 0
-		self.url = url
-		self.wordcloud_count = 10
+		self.commas_list = []
+		self.question_marks_list = []
 
 	def fetch(self):
 
@@ -84,12 +87,12 @@ class RapGetter():
 
 			text = text.split(",")
 			s = ''
-			self.commas = len(text) - 1
+			self.commas_list.append(len(text) - 1)
 			text = s.join(text).lower().strip()
 
 			text = text.split("?")
 			s = ''
-			self.question_marks = len(text) - 1
+			self.question_marks_list.append(len(text) - 1)
 			text = s.join(text).lower().strip()
 
 			text = re.sub('\s\s+', ' ', text)
@@ -157,11 +160,24 @@ class RapGetter():
 				'Text': self.word_list[i],
 				'Album': self.album,
 				'Song': self.song_titles[i],
-				'Commas': self.commas,
-				'Question Marks': self.question_marks
+				'Commas': self.commas_list[i],
+				'Question Marks': self.question_marks_list[i]
 				}, ignore_index=True)
 		return RapGetter._df
 		# return RapGetter._df
+
+
+url_list = [
+	'https://genius.com/albums/Chance-the-rapper/Coloring-book',
+	'https://genius.com/albums/Ybn-cordae/The-lost-boy',
+]
+
+for url in url_list:
+	lyrics = RapGetter(url)
+	lyrics.fetch()
+	lyrics.clean()
+	lyrics.dataframe()
+
 
 # class MarkovRap:
 
@@ -204,18 +220,6 @@ class RapGetter():
 
 # Randomly generate a start point for markov model?
 
-url_list = [
-	'https://genius.com/albums/Chance-the-rapper/Coloring-book',
-	'https://genius.com/albums/Ybn-cordae/The-lost-boy',
-]
-
-for url in url_list:
-	lyrics = RapGetter(url)
-	lyrics.fetch()
-	lyrics.clean()
-	lyrics.dataframe()
-
-# print(RapGetter._df)
 
 # rap = MarkovRap(lyrics.arr[0], 7)
 # rap.kgram()
