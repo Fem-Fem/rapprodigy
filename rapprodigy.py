@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 
 class RapGetter():
 
-	_df = pd.DataFrame(columns = ['Artist', 'Album,' 'Song', 'Text', 'Commas', 'Question Marks'])
+	_df = pd.DataFrame(columns = ['Artist', 'Album', 'Song', 'Text', 'Commas', 'Question Marks'])
 
 	def __init__(self, url):
 		# for markov?
