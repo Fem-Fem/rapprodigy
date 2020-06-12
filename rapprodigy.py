@@ -1,3 +1,4 @@
+print("START RAPGETTER CLASS")
 import config
 import requests
 import bs4 as bs
@@ -31,13 +32,13 @@ class RapGetter():
 		self.url = url
 		self.queries = []
 		self.wordcloud_count = 10
-
-		self.artist = re.search(r'albums\/(.*?)\/', url).group(1)
-		self.album = re.search(r'.+(\/.+)$', url).group(1)
+		self.artist = url.split("/")[4]
+		self.album = url.split("/")[5]
 		self.song_titles = []
 		self.word_list = []
 		self.commas_list = []
 		self.question_marks_list = []
+
 
 	def fetch(self):
 
@@ -100,7 +101,6 @@ class RapGetter():
 
 	# make method to call markov model
 
-
 	# this will return different info if I've run `compile` or not though, not exactly ideal. 
 	def print_info(self):
 		print(self.original_text[0])
@@ -119,7 +119,6 @@ class RapGetter():
 		return word_appears_more_than_n_times
 
 
-	# can i break this up?
 	# need to make wordcloud per song, per album, and per artist?
 	def wordcloud(self):
 		# count number of unique variables
@@ -147,12 +146,7 @@ class RapGetter():
 		plt.axis("off")
 		plt.show()
 
-	# @classmethod
-	# def dataframe(cls):
-	# 	return 
 
-	# this is incorrect, i want to be able to create a dataframe and append things to it :/
-	# ask for help
 	def dataframe(self):
 		for i in range(len(self.word_list)):
 			RapGetter._df = RapGetter._df.append({
@@ -163,64 +157,70 @@ class RapGetter():
 				'Commas': self.commas_list[i],
 				'Question Marks': self.question_marks_list[i]
 				}, ignore_index=True)
+		print("RAPGETTER DATAFRAME")
+		print(RapGetter._df)
 		return RapGetter._df
-		# return RapGetter._df
+
+print("END RAPGETTER CLASS")
+
+class MarkovRap:
+
+	def __init__(self, text, k_int):
+		self.text = text
+		self.k_int = k_int
+		self.dictionary = ''
+
+
+	def kgram(self):
+		library = {}
+		text_tester = self.text
+		for i in range(self.k_int):
+			text_tester = text_tester + self.text[i]
+		for i in range(len(self.text)):
+			k = i + self.k_int
+			if library.get(text_tester[i:k]) == None:
+				library[text_tester[i:k]] = {text_tester[k]: 1}
+			else:
+				if library[text_tester[i:k]].get(text_tester[k]):
+					library[text_tester[i:k]][text_tester[k]] = library[text_tester[i:k]][text_tester[k]] + 1
+				else:
+					library[text_tester[i:k]][text_tester[k]] = 1
+		self.dictionary = library
+
+
+	def next_letter(self, text):
+		for z in range(500):
+			population = []
+			weights = []
+			for i in self.dictionary[text[-self.k_int:]]:
+				population.append(i)
+				weights.append(self.dictionary[text[-self.k_int:]][i])
+			new_letter = random.choices(population, weights)
+			text = text + new_letter[0]
+		print(text)
+
+
+	def print_info(self):
+		print(self.text)
+		print(self.k_int)
+		print(self.dictionary)
+
 
 
 url_list = [
-	'https://genius.com/albums/Chance-the-rapper/Coloring-book',
-	'https://genius.com/albums/Ybn-cordae/The-lost-boy',
+	'https://genius.com/albums/Ybn-cordae/The-lost-boy'
 ]
-
 for url in url_list:
 	lyrics = RapGetter(url)
 	lyrics.fetch()
 	lyrics.clean()
 	lyrics.dataframe()
 
-
-# class MarkovRap:
-
-# 	def __init__(self, text, k_int):
-# 		self.text = text
-# 		self.k_int = k_int
-# 		self.dictionary = ''
-# 	#perhaps add code so that different rap lyrics dont rap around but instead they are counted for the markov model each time??
-# 	def kgram(self):
-# 		library = {}
-# 		text_tester = self.text
-# 		for i in range(self.k_int):
-# 			text_tester = text_tester + self.text[i]
-# 		for i in range(len(self.text)):
-# 			k = i + self.k_int
-# 			if library.get(text_tester[i:k]) == None:
-# 				library[text_tester[i:k]] = {text_tester[k]: 1}
-# 			else:
-# 				if library[text_tester[i:k]].get(text_tester[k]):
-# 					library[text_tester[i:k]][text_tester[k]] = library[text_tester[i:k]][text_tester[k]] + 1
-# 				else:
-# 					library[text_tester[i:k]][text_tester[k]] = 1
-# 		self.dictionary = library
-
-# 	def next_letter(self, text):
-# 		for z in range(500):
-# 			population = []
-# 			weights = []
-# 			for i in self.dictionary[text[-self.k_int:]]:
-# 				population.append(i)
-# 				weights.append(self.dictionary[text[-self.k_int:]][i])
-# 			new_letter = random.choices(population, weights)
-# 			text = text + new_letter[0]
-# 		print(text)
-
-# 	def print_info(self):
-# 		print(self.text)
-# 		print(self.k_int)
-# 		print(self.dictionary)
-
-# Randomly generate a start point for markov model?
+j = ''
+for i in lyrics.word_list:
+	j = j + i
+rap = MarkovRap(j, 7)
+rap.kgram()
+rap.next_letter("broke a") 
 
 
-# rap = MarkovRap(lyrics.arr[0], 7)
-# rap.kgram()
-# rap.next_letter("broke a")
