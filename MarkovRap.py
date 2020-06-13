@@ -34,9 +34,9 @@ class MarkovRap:
 				weights.append(self.dictionary[text[-self.k_int:]][i])
 			new_letter = random.choices(population, weights)
 			text = text + new_letter[0]
-		print(text)
-
-
+		return text
+		
+	
 	def print_info(self):
 		print(self.text)
 		print(self.k_int)

@@ -1,6 +1,9 @@
 from RapGetter import RapGetter
 from MarkovRap import MarkovRap
 
+import os
+from twilio.rest import Client
+
 # remove albums with super long outros and skits?
 
 # parser = argparse.ArgumentParser()
@@ -28,7 +31,33 @@ for i in lyrics.word_list:
 	j = j + i
 rap = MarkovRap(j, 7)
 rap.kgram()
-rap.next_letter("broke a") 
+fake_rap = rap.next_letter("broke a") 
+print(fake_rap)
 
-import os
-from twilio.rest import Client
+# account_sid = "ACb5407cc24afbc49989f0d556f9c79dbd"
+# auth_token = "ba3638225089714093744ac9c736af26"
+
+# client = Client(account_sid, auth_token)
+
+# client.messages.create(
+# 	to="+16095535610",
+# 	from_="+12015970044",
+# 	body=fake_rap
+# )
+
+from flask import Flask, request, redirect
+from twilio.twiml.messaging_response import MessagingResponse
+
+app = Flask(__name__)
+
+@app.route("/sms", methods=['GET', 'POST'])
+
+def sms_reply():
+	resp = MessagingResponse()
+
+	resp.message(fake_rap)
+
+	return str(resp)
+
+if __name__ == "__main__":
+	app.run(debug=True)
